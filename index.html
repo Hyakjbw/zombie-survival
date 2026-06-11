@@ -16,7 +16,7 @@
 
     <script>
         // Địa chỉ IP và Port từ host của bạn
-        const client = new Colyseus.Client('ws://Kinetic.pikamc.vn:25808');
+        const client = new Colyseus.Client('wss://Kinetic.pikamc.vn:25808');
 
         // Yêu cầu máy chủ cho phép vào phòng "survival"
         client.joinOrCreate("survival").then(room => {
