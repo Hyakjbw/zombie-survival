@@ -2,33 +2,59 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Mini DayZ Web - Test Kết Nối</title>
-    <script src="https://unpkg.com/colyseus.js@^0.15.0/dist/colyseus.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini DayZ Web - Gỡ Lỗi</title>
+    <script src="https://cdn.jsdelivr.net/npm/colyseus.js@0.15.0/dist/colyseus.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #2c3e50; color: white; }
-        #status { font-size: 24px; font-weight: bold; color: #f39c12; margin-top: 20px;}
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 20px; background-color: #2c3e50; color: white; }
+        #status { font-size: 22px; font-weight: bold; color: #f39c12; margin-top: 10px;}
+        #log { background: #1a252f; text-align: left; padding: 15px; margin: 20px; border-radius: 5px; font-family: monospace; font-size: 14px; color: #2ecc71; white-space: pre-wrap;}
     </style>
 </head>
 <body>
-    <h1>Thử Nghiệm Sinh Tồn Online</h1>
-    <p>Hệ thống đang gọi đến máy chủ PikaMC...</p>
-    <div id="status">Đang chờ kết nối...</div>
+    <h1>Trình Theo Dõi Kết Nối</h1>
+    <div id="status">Đang tải tài nguyên...</div>
+    <div id="log"></div>
 
     <script>
-        // Địa chỉ IP và Port từ host của bạn
-        const client = new Colyseus.Client('ws://180.93.103.158:25808');
+        function addLog(msg) {
+            document.getElementById("log").innerHTML += msg + "<br>";
+        }
 
-        // Yêu cầu máy chủ cho phép vào phòng "survival"
-        client.joinOrCreate("survival").then(room => {
-            // Nếu kết nối thành công, đổi chữ thành màu xanh lá
-            document.getElementById("status").innerText = "Đã kết nối thành công vào game!";
-            document.getElementById("status").style.color = "#2ecc71";
-            
-        }).catch(e => {
-            // Nếu lỗi, đổi chữ thành màu đỏ và báo lỗi
-            document.getElementById("status").innerText = "Kết nối thất bại. Lỗi: " + e;
-            document.getElementById("status").style.color = "#e74c3c";
-        });
+        // MỚI: Bắt buộc trình duyệt đợi tải xong 100% mọi thứ mới bắt đầu chạy code
+        window.onload = function() {
+            try {
+                addLog("[1] Đã tải xong nền web. Kiểm tra thư viện...");
+                
+                if (typeof Colyseus === "undefined") {
+                    throw new Error("Thư viện Colyseus vẫn chưa tải được. Safari hoặc mạng đang chặn link tải.");
+                }
+                
+                addLog("[2] Thư viện OK. Thiết lập đường truyền...");
+
+                const protocol = window.location.protocol.replace("http", "ws");
+                const endpoint = protocol + "//" + window.location.host;
+                addLog("[3] Địa chỉ mục tiêu: " + endpoint);
+
+                const client = new Colyseus.Client(endpoint);
+                addLog("[4] Đang gõ cửa phòng 'survival'...");
+                document.getElementById("status").innerText = "Đang kết nối WebSocket...";
+
+                client.joinOrCreate("survival").then(room => {
+                    document.getElementById("status").innerText = "THÀNH CÔNG!";
+                    document.getElementById("status").style.color = "#2ecc71";
+                    addLog("[5] Đã vào phòng! ID: " + room.sessionId);
+                }).catch(e => {
+                    document.getElementById("status").innerText = "LỖI KẾT NỐI!";
+                    document.getElementById("status").style.color = "#e74c3c";
+                    addLog("[LỖI SERVER TỪ CHỐI] " + e.message);
+                });
+            } catch (error) {
+                document.getElementById("status").innerText = "LỖI HỆ THỐNG!";
+                document.getElementById("status").style.color = "#e74c3c";
+                addLog("[LỖI CODE TRÌNH DUYỆT] " + error.message);
+            }
+        };
     </script>
 </body>
 </html>
