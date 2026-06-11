@@ -32,9 +32,9 @@
                 
                 addLog("[2] Thư viện OK. Thiết lập đường truyền...");
 
-                const protocol = window.location.protocol.replace("http", "ws");
-                const endpoint = protocol + "//" + window.location.host;
-                addLog("[3] Địa chỉ mục tiêu: " + endpoint);
+                // Gắn cố định địa chỉ máy chủ PikaMC
+const endpoint = "ws://180.93.103.158:25808";
+addLog("[3] Địa chỉ mục tiêu: " + endpoint);
 
                 const client = new Colyseus.Client(endpoint);
                 addLog("[4] Đang gõ cửa phòng 'survival'...");
